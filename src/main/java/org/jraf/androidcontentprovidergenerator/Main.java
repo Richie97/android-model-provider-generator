@@ -227,7 +227,9 @@ public class Main {
         String providerJavaPackage = config.getString(Json.PROVIDER_JAVA_PACKAGE);
         File providerDir = new File(arguments.outputDir, providerJavaPackage.replace('.', '/'));
         File baseClassesDir = new File(providerDir, "base");
+        File modelClassesDir = new File(providerDir, "model");
         baseClassesDir.mkdirs();
+        modelClassesDir.mkdirs();
 
         Map<String, Object> root = new HashMap<String, Object>();
         root.put("config", getConfig(arguments.inputDir));
@@ -280,6 +282,14 @@ public class Main {
             out = new OutputStreamWriter(new FileOutputStream(outputFile));
             root.put("entity", entity);
             template = getFreeMarkerConfig().getTemplate("selection.ftl");
+            template.process(root, out);
+            IOUtils.closeQuietly(out);
+
+            // Model builder
+            outputFile = new File(modelClassesDir, entity.getNameCamelCase() + "Model.java");
+            out = new OutputStreamWriter(new FileOutputStream(outputFile));
+            root.put("entity", entity);
+            template = getFreeMarkerConfig().getTemplate("model.ftl");
             template.process(root, out);
             IOUtils.closeQuietly(out);
 

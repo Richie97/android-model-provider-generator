@@ -20,6 +20,7 @@ public abstract class AbstractSelection <T extends AbstractSelection<?>> {
     private static final String IS_NOT_NULL = " is not null";
     private static final String IN = " in(";
     private static final String NOT_IN = " not in(";
+    private static final String LIKE = " like ";
     private static final String COMMA = ",";
     private static final String GT = ">?";
     private static final String LT = "<?";
@@ -113,6 +114,31 @@ public abstract class AbstractSelection <T extends AbstractSelection<?>> {
         mSelection.append(LT_EQ);
         mSelectionArgs.add(valueOf(value));
     }
+
+    protected void addLike(String column, Object[] value) {
+            mSelection.append(column);
+
+            if (value == null) {
+                // Single null value
+                mSelection.append(IS_NULL);
+            } else if (value.length > 1) {
+                // Multiple values ('in' clause)
+                mSelection.append(LIKE);
+                for (int i = 0; i < value.length; i++) {
+                    mSelection.append("?");
+                    if (i < value.length - 1) {
+                        mSelection.append(COMMA);
+                    }
+                    mSelectionArgs.add(valueOf(value[i]));
+                }
+                mSelection.append("");
+            } else {
+                // Single value
+                mSelection.append(LIKE).append("?");
+                mSelectionArgs.add(valueOf(value[0]));
+
+            }
+        }
 
     private String valueOf(Object obj) {
         if (obj instanceof Date) {
