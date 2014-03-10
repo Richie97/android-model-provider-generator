@@ -22,42 +22,52 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.androidcontentprovidergenerator.model;
-
+package com.willowtreeapps.androidcontentprovidergenerator.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Model {
-    private static final Model INSTANCE = new Model();
+import org.apache.commons.lang.WordUtils;
 
-    public static Model get() {
-        return INSTANCE;
+public class Entity {
+    private final String mName;
+    private final List<Field> mFields = new ArrayList<Field>();
+    private final List<Constraint> mConstraints = new ArrayList<Constraint>();
+
+    public Entity(String name) {
+        mName = name.toLowerCase();
     }
 
-    private Model() {}
-
-    private final List<Entity> mEntities = new ArrayList<Entity>();
-    private String mHeader;
-
-    public void addEntity(Entity entity) {
-        mEntities.add(entity);
+    public void addField(Field field) {
+        mFields.add(field);
     }
 
-    public List<Entity> getEntities() {
-        return Collections.unmodifiableList(mEntities);
+    public List<Field> getFields() {
+        return Collections.unmodifiableList(mFields);
     }
 
-    public void setHeader(String header) {
-        mHeader = header;
+    public void addConstraint(Constraint constraint) {
+        mConstraints.add(constraint);
     }
 
-    public String getHeader() {
-        return mHeader;
+    public List<Constraint> getConstraints() {
+        return Collections.unmodifiableList(mConstraints);
+    }
+
+    public String getNameCamelCase() {
+        return WordUtils.capitalizeFully(mName, new char[] { '_' }).replaceAll("_", "");
+    }
+
+    public String getNameLowerCase() {
+        return mName;
+    }
+
+    public String getNameUpperCase() {
+        return mName.toUpperCase();
     }
 
     @Override
     public String toString() {
-        return mEntities.toString();
+        return "Entity [mName=" + mName + ", mFields=" + mFields + ", mConstraints=" + mConstraints + "]";
     }
 }
