@@ -11,8 +11,8 @@ It takes a set of entity (a.k.a "table") definitions as the input, and generates
 - one `Cursor` class per entity
 - one `ContentValues` class per entity
 - one `Selection` class per entity
-- one Model class per entity
-- one ViewModel class per entity
+- one 'Model' class per entity
+- one 'ViewModel' class per entity
 - one Layout xml file per ViewModel
 
 How to use
