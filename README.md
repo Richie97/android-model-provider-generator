@@ -1,7 +1,9 @@
-Android ContentProvider Generator
+WTA Generator
 =================================
+Forked from the awesome android-contentprovider-generator
 
-A tool to generate an Android ContentProvider.
+A tool to generate a Content Provider and the associated ViewModels and Model classes
+
 It takes a set of entity (a.k.a "table") definitions as the input, and generates:
 - a `ContentProvider` class
 - a `SQLiteOpenHelper` class
@@ -102,11 +104,11 @@ If a `header.txt` file is present, its contents will be inserted at the top of e
 ### Get the app
 
 Download the jar from here:
-https://github.com/BoD/android-contentprovider-generator/releases/latest
+https://github.com/--insert jar here when it's done--
 
 ### Run the app
 
-`java -jar android-contentprovider-generator-1.5-bundle.jar -i <input folder> -o <output folder>`
+`java -jar wta-generator-1.5-bundle.jar -i <input folder> -o <output folder>`
 - Input folder: where to find _config.json and your entity json files
 - Output folder: where the resulting files will be generated
 
@@ -153,7 +155,7 @@ You need maven to build this app.
 
 `mvn package`
 
-This will produce `android-contentprovider-generator-1.5-bundle.jar` in the `target` folder.
+This will produce `wta-generator-1.5-bundle.jar` in the `target` folder.
 
 
 Licence
