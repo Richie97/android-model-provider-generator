@@ -24,6 +24,15 @@ public class ${entity.nameCamelCase}Model{
     <#case "DOUBLE">
     public <#if field.isNullable>Double<#else>double</#if> ${field.nameCamelCaseLowerCase};
     <#break>
+    <#case "ENUM">
+    public ${field.nameCamelCase} ${field.nameCamelCaseLowerCase};
+    <#break>
+    <#case "BOOLEAN">
+    public Boolean ${field.nameCamelCaseLowerCase};
+    <#break>
+    <#case "BYTE[]">
+    public byte[] ${field.nameCamelCaseLowerCase};
+    <#break>
     <#default>
     public String ${field.nameCamelCaseLowerCase};
     <#break>
