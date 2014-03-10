@@ -1,7 +1,7 @@
 <#if header??>
 ${header}
 </#if>
-package ${config.providerJavaPackage};
+package ${config.projectPackageId}.model;
 
 /**
  * Model object for the {@code ${entity.nameLowerCase}}.

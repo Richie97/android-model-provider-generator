@@ -40,7 +40,6 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import com.beust.jcommander.JCommander;
 import com.willowtreeapps.androidcontentprovidergenerator.model.Constraint;
