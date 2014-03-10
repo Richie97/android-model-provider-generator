@@ -4,7 +4,7 @@ ${header}
 package ${config.providerJavaPackage};
 
 /**
- * Adapter  for the {@code ${entity.nameLowerCase}} object.
+ * Model object for the {@code ${entity.nameLowerCase}}.
  */
 public class ${entity.nameCamelCase}Model{
     <#list entity.fields as field>

@@ -22,23 +22,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.androidcontentprovidergenerator;
+package com.willowtreeapps.androidcontentprovidergenerator.model;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import java.io.File;
+public class Model {
+    private static final Model INSTANCE = new Model();
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
+    public static Model get() {
+        return INSTANCE;
+    }
 
-@Parameters(separators = " =")
-public class Arguments {
-    public static String DEFAULT_TITLE = "GenerateAndroidProvider";
+    private Model() {}
 
-    @Parameter(names = { "-h", "--help" }, description = "Display this help and exit")
-    public boolean help;
+    private final List<Entity> mEntities = new ArrayList<Entity>();
+    private String mHeader;
 
-    @Parameter(names = { "-i", "--input" }, description = "Input folder, where to find _config.json and your entity json files")
-    public File inputDir = new File(".");
+    public void addEntity(Entity entity) {
+        mEntities.add(entity);
+    }
 
-    @Parameter(names = { "-o", "--output" }, description = "Output folder, where the resulting files will be generated")
-    public File outputDir = new File("generated");
+    public List<Entity> getEntities() {
+        return Collections.unmodifiableList(mEntities);
+    }
+
+    public void setHeader(String header) {
+        mHeader = header;
+    }
+
+    public String getHeader() {
+        return mHeader;
+    }
+
+    @Override
+    public String toString() {
+        return mEntities.toString();
+    }
 }

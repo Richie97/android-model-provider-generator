@@ -22,8 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.androidcontentprovidergenerator.model;
-
+package com.willowtreeapps.androidcontentprovidergenerator.model;
 public class Constraint {
     public static class Json {
         public static final String NAME = "name";

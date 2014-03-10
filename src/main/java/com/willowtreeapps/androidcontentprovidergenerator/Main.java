@@ -22,8 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.androidcontentprovidergenerator;
-
+package com.willowtreeapps.androidcontentprovidergenerator;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -38,15 +37,16 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.jraf.androidcontentprovidergenerator.model.Constraint;
-import org.jraf.androidcontentprovidergenerator.model.Entity;
-import org.jraf.androidcontentprovidergenerator.model.Field;
-import org.jraf.androidcontentprovidergenerator.model.Model;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import com.beust.jcommander.JCommander;
+import com.willowtreeapps.androidcontentprovidergenerator.model.Constraint;
+import com.willowtreeapps.androidcontentprovidergenerator.model.Entity;
+import com.willowtreeapps.androidcontentprovidergenerator.model.Field;
+import com.willowtreeapps.androidcontentprovidergenerator.model.Model;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -225,11 +225,16 @@ public class Main {
     private void generateWrappers(Arguments arguments) throws IOException, JSONException, TemplateException {
         JSONObject config = getConfig(arguments.inputDir);
         String providerJavaPackage = config.getString(Json.PROVIDER_JAVA_PACKAGE);
+        File baseDir = new File(arguments.outputDir, config.getString(Json.PROJECT_PACKAGE_ID).replace('.', '/'));
         File providerDir = new File(arguments.outputDir, providerJavaPackage.replace('.', '/'));
         File baseClassesDir = new File(providerDir, "base");
-        File modelClassesDir = new File(providerDir, "model");
+        File modelClassesDir = new File(baseDir, "model");
+        File viewClassesDir = new File(baseDir, "ui/viewmodel");
+        File resDir = new File(arguments.outputDir+"/res", "layout");
         baseClassesDir.mkdirs();
         modelClassesDir.mkdirs();
+        viewClassesDir.mkdirs();
+        resDir.mkdirs();
 
         Map<String, Object> root = new HashMap<String, Object>();
         root.put("config", getConfig(arguments.inputDir));
@@ -255,6 +260,8 @@ public class Main {
         out = new OutputStreamWriter(new FileOutputStream(outputFile));
         template.process(root, out);
         IOUtils.closeQuietly(out);
+
+
 
         // Entities
         for (Entity entity : Model.get().getEntities()) {
@@ -290,6 +297,22 @@ public class Main {
             out = new OutputStreamWriter(new FileOutputStream(outputFile));
             root.put("entity", entity);
             template = getFreeMarkerConfig().getTemplate("model.ftl");
+            template.process(root, out);
+            IOUtils.closeQuietly(out);
+
+            // ViewModel builder
+            outputFile = new File(viewClassesDir, entity.getNameCamelCase() + "View.java");
+            out = new OutputStreamWriter(new FileOutputStream(outputFile));
+            root.put("entity", entity);
+            template = getFreeMarkerConfig().getTemplate("view.ftl");
+            template.process(root, out);
+            IOUtils.closeQuietly(out);
+
+            // Layout builder
+            outputFile = new File(resDir, "view_" + entity.getNameLowerCase() + ".xml");
+            out = new OutputStreamWriter(new FileOutputStream(outputFile));
+            root.put("entity", entity);
+            template = getFreeMarkerConfig().getTemplate("layout.ftl");
             template.process(root, out);
             IOUtils.closeQuietly(out);
 
