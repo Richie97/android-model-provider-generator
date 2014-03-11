@@ -3,6 +3,14 @@ ${header}
 </#if>
 package ${config.projectPackageId}.ui.viewmodel;
 
+import android.content.Context;
+import android.util.AttributeSet;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import ${config.projectPackageId}.R;
+import oak.viewmodel.ViewModel;
+
 /**
  * ViewModel object for the {@code ${entity.nameLowerCase}}.
  */
