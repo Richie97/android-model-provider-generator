@@ -8,6 +8,9 @@ package ${config.projectPackageId}.model;
  */
 public class ${entity.nameCamelCase}Model{
     <#list entity.fields as field>
+    <#if field.serializedName?has_content>
+    @SerializedName("${field.serializedName}")
+    </#if>
     <#switch field.type.name()>
     <#case "DATE">
     public <#if field.isNullable>Long<#else>long</#if> ${field.nameCamelCaseLowerCase};

@@ -64,4 +64,20 @@ public class ${entity.nameCamelCase}ContentValues extends AbstractContentValues 
     <#break>
     </#switch>
     </#list>
+
+    public static ContentValues[] getContentValues(${entity.nameCamelCase}Model... items){
+        List<ContentValues> values = new ArrayList<ContentValues>();
+        for(${entity.nameCamelCase} item : items){
+            values.add(getSingleContentValue(item));
+        }
+        return values.toArray(new ContentValues[values.size()]);
+    }
+
+    public static ContentValues getSingleContentValue(${entity.nameCamelCase}Model item){
+        ${entity.nameCamelCase}ContentValues values = new ${entity.nameCamelCase}ContentValues();
+        <#list entity.fields as field>
+        values.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, item.${field.nameCamelCaseLowerCase});
+        </#list>
+        return values.getContentValues();
+    }
 }

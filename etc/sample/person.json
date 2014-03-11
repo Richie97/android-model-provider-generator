@@ -2,6 +2,7 @@
 	"fields": [
 		{
 			"name": "first_name",
+			"serializedName": "FirstName",
 			"type": "String"
 		},
 		{
@@ -54,5 +55,12 @@
 			"name": "fk_company",
 			"definition": "foreign key (company_id) references company (_id) on delete cascade",
 		},
+	],
+
+	"urlPath":"/person/{user}/info",
+	"queryParams":[
+	    {
+            "name": "userId",
+        },
 	],
 }

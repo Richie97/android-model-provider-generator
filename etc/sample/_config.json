@@ -7,4 +7,5 @@
 	"sqliteHelperClassName": "ExampleSQLiteOpenHelper",
 	"databaseFileName": "example.db",
 	"enableForeignKeys": true,
+	"projectBaseUrl": "http://api.example.com",
 }

@@ -66,6 +66,7 @@ public class Main {
         public static final String AUTHORITY = "authority";
         public static final String DATABASE_FILE_NAME = "databaseFileName";
         public static final String ENABLE_FOREIGN_KEY = "enableForeignKeys";
+        public static final String PROJECT_BASE_URL = "projectBaseUrl";
     }
 
     private Configuration mFreemarkerConfig;
@@ -94,7 +95,7 @@ public class Main {
             Entity entity = new Entity(entityName);
             String fileContents = FileUtils.readFileToString(entityFile);
             JSONObject entityJson = new JSONObject(fileContents);
-
+            entity.setUrl(entityJson.optString("urlPath"));
             // Fields
             JSONArray fieldsJson = entityJson.getJSONArray("fields");
             int len = fieldsJson.length();
@@ -102,6 +103,7 @@ public class Main {
                 JSONObject fieldJson = fieldsJson.getJSONObject(i);
                 if (Config.LOGD) Log.d(TAG, "fieldJson=" + fieldJson);
                 String name = fieldJson.getString(Field.Json.NAME);
+                String serializedName = fieldJson.optString(Field.Json.SERIALIZED_NAME);
                 String type = fieldJson.getString(Field.Json.TYPE);
                 boolean isIndex = fieldJson.optBoolean(Field.Json.INDEX, false);
                 boolean isNullable = fieldJson.optBoolean(Field.Json.NULLABLE, true);
@@ -116,7 +118,7 @@ public class Main {
                         enumValues.add(valueName);
                     }
                 }
-                Field field = new Field(name, type, isIndex, isNullable, defaultValue, enumName, enumValues);
+                Field field = new Field(name, serializedName, type, isIndex, isNullable, defaultValue, enumName, enumValues);
                 entity.addField(field);
             }
 
@@ -131,6 +133,17 @@ public class Main {
                     String definition = constraintJson.getString(Constraint.Json.DEFINITION);
                     Constraint constraint = new Constraint(name, definition);
                     entity.addConstraint(constraint);
+                }
+            }
+
+            // QueryParams (optional)
+            JSONArray paramsJson = entityJson.optJSONArray("queryParams");
+            if (paramsJson != null) {
+                len = paramsJson.length();
+                for (int i = 0; i < len; i++) {
+                    JSONObject constraintJson = paramsJson.getJSONObject(i);
+                    String name = constraintJson.getString(Constraint.Json.NAME);
+                    entity.addQueryParam(name);
                 }
             }
 
@@ -179,6 +192,7 @@ public class Main {
         ensureString(Json.AUTHORITY);
         ensureString(Json.DATABASE_FILE_NAME);
         ensureBoolean(Json.ENABLE_FOREIGN_KEY);
+        ensureString(Json.PROJECT_BASE_URL);
     }
 
     private void ensureString(String field) {
@@ -347,6 +361,40 @@ public class Main {
         template.process(root, out);
     }
 
+    private void generateIntentService(Arguments arguments) throws IOException, JSONException, TemplateException {
+        Template template = getFreeMarkerConfig().getTemplate("intentservice.ftl");
+        JSONObject config = getConfig(arguments.inputDir);
+        String apiJavaPackage = config.getString(Json.PROJECT_PACKAGE_ID) + ".api";
+        File apiDir = new File(arguments.outputDir, apiJavaPackage.replace('.', '/'));
+        apiDir.mkdirs();
+        File outputFile = new File(apiDir, "ApiService.java");
+        Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", config);
+        root.put("model", Model.get());
+        root.put("header", Model.get().getHeader());
+
+        template.process(root, out);
+    }
+
+    private void generateRestService(Arguments arguments) throws IOException, JSONException, TemplateException {
+        Template template = getFreeMarkerConfig().getTemplate("retroservice.ftl");
+        JSONObject config = getConfig(arguments.inputDir);
+        String apiJavaPackage = config.getString(Json.PROJECT_PACKAGE_ID) + ".api";
+        File apiDir = new File(arguments.outputDir, apiJavaPackage.replace('.', '/'));
+        apiDir.mkdirs();
+        File outputFile = new File(apiDir, "RestService.java");
+        Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", config);
+        root.put("model", Model.get());
+        root.put("header", Model.get().getHeader());
+
+        template.process(root, out);
+    }
+
     private void generateSqliteHelper(Arguments arguments) throws IOException, JSONException, TemplateException {
         Template template = getFreeMarkerConfig().getTemplate("sqlitehelper.ftl");
         JSONObject config = getConfig(arguments.inputDir);
@@ -380,6 +428,8 @@ public class Main {
         generateColumns(arguments);
         generateWrappers(arguments);
         generateContentProvider(arguments);
+        generateIntentService(arguments);
+        generateRestService(arguments);
         generateSqliteHelper(arguments);
     }
 
