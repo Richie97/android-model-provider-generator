@@ -9,6 +9,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 <#if config.generateProvider>
 import ${config.providerJavaPackage}.${entity.nameLowerCase}.${entity.nameCamelCase}Cursor;
+<#elseif config.generateModels>
+import ${config.projectPackageId}.model.${entity.nameCamelCase}Model;
+<#else>
+import ${config.projectPackageId}.model.${entity.nameCamelCase}Model;
 </#if>
 
 import ${config.projectPackageId}.R;

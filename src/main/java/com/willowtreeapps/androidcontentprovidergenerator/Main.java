@@ -243,16 +243,9 @@ public class Main {
     private void generateWrappers(Arguments arguments) throws IOException, JSONException, TemplateException {
         JSONObject config = getConfig(arguments.inputDir);
         String providerJavaPackage = config.getString(Json.PROVIDER_JAVA_PACKAGE);
-        File baseDir = new File(arguments.outputDir, config.getString(Json.PROJECT_PACKAGE_ID).replace('.', '/'));
         File providerDir = new File(arguments.outputDir, providerJavaPackage.replace('.', '/'));
         File baseClassesDir = new File(providerDir, "base");
-        File modelClassesDir = new File(baseDir, "model");
-        File viewClassesDir = new File(baseDir, "ui/viewmodel");
-        File resDir = new File(arguments.outputDir+"/res", "layout");
         baseClassesDir.mkdirs();
-        modelClassesDir.mkdirs();
-        viewClassesDir.mkdirs();
-        resDir.mkdirs();
 
         Map<String, Object> root = new HashMap<String, Object>();
         root.put("config", getConfig(arguments.inputDir));
@@ -412,6 +405,7 @@ public class Main {
         JSONObject config = getConfig(arguments.inputDir);
         File baseDir = new File(arguments.outputDir, config.getString(Json.PROJECT_PACKAGE_ID).replace('.', '/'));
         File modelClassesDir = new File(baseDir, "model");
+        modelClassesDir.mkdirs();
         Map<String, Object> root = new HashMap<String, Object>();
         root.put("config", getConfig(arguments.inputDir));
         root.put("header", Model.get().getHeader());

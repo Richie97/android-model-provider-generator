@@ -26,13 +26,18 @@ These are self-explanatory so here is an example:
 ```json
 {
 	"toolVersion": "1.5",
-	"projectPackageId": "com.example.app",
-	"authority": "com.example.app.provider",
-	"providerJavaPackage": "com.example.app.provider",
+	"projectPackageId": "com.test",
+	"authority": "com.test.provider",
+	"providerJavaPackage": "com.test.provider",
 	"providerClassName": "ExampleProvider",
 	"sqliteHelperClassName": "ExampleSQLiteOpenHelper",
 	"databaseFileName": "example.db",
 	"enableForeignKeys": true,
+	"projectBaseUrl": "http://api.example.com",
+	"generateProvider":true,
+	"generateModels":true,
+	"generateViews":true,
+	"generateApi":true,
 }
 ```
 
@@ -62,39 +67,70 @@ Here is a `person.json` file as an example:
 	"fields": [
 		{
 			"name": "first_name",
-			"type": "String",
-			"default_value": "John"
+			"serializedName": "FirstName",
+			"type": "String"
 		},
 		{
 			"name": "last_name",
-			"type": "String",
-			"nullable": true,
-			"default_value": "Doe"
+			"type": "String"
 		},
 		{
 			"name": "age",
 			"type": "Integer",
+			"nullable": false
+		},
+		{
+			"name": "is_blue_eyes",
+			"type": "Boolean",
+			"default_value": "1"
+		},
+		{
+			"name": "date_of_birth",
+			"type": "Date",
 			"index": true
 		},
 		{
-			"name": "gender",
-			"type": "enum",
-			"enumName": "Gender",
-			"enumValues": [
-				"MALE",
-				"FEMALE",
-				"OTHER",
-			],
+			"name": "height",
+			"type": "Float"
+		},
+		{
+			"name": "company_id",
+			"type": "Long",
 			"nullable": false,
 		},
+        {
+         "name": "gender",
+         "type": "enum",
+         "enumName": "Gender",
+         "enumValues": [
+             "MALE",
+             "FEMALE",
+             "OTHER",
+         ],
+         "nullable": false,
+        }
 	],
-	
+
 	"constraints": [
 		{
 			"name": "unique_name",
 			"definition": "unique (first_name, last_name) on conflict replace"
-		}
-	]
+		},
+		{
+			"name": "fk_company",
+			"definition": "foreign key (company_id) references company (_id) on delete cascade",
+		},
+	],
+
+	"urlPath":"/person/{user}/info",
+	"queryParams":[
+	    {
+            "name": "userId",
+        },
+        {
+            "name": "stuff",
+        },
+	],
 }
 ```
 
@@ -149,7 +185,15 @@ PersonContentValues values = new PersonContentValues();
 values.putFirstName("John").putAge(42);
 context.getContentResolver().update(personUri, values.values(), null, null);
 ```
+- When generating the Model Classes, if they are generated with a ContentProvider they come with a handy Constructor which takes a CursorWrapper of that objects type
 
+```java
+PersonCursor wrappedCursor = new PersonCursor(cursor);
+Person person = new Person(wrappedCursor);
+```
+
+- When generated, the API uses a stubbed out Retrofit interface and an IntentService for network calls
+- In addition, when generating the API, it also ties into the ContentProvider(if all components were generated)
 
 Building
 --------

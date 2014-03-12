@@ -1,8 +1,10 @@
 package ${config.projectPackageId}.api;
 
 <#list model.entities as entity>
+<#if config.generateModels>
 <#if entity.url?has_content>
 import ${config.projectPackageId}.model.${entity.nameCamelCase}Model;
+</#if>
 </#if>
 </#list>
 import java.util.List;
@@ -12,6 +14,7 @@ import retrofit.http.Query;
 
 public interface RestService{
     <#list model.entities as entity>
+    <#if config.generateModels>
     <#if entity.url?has_content>
     @GET("${entity.url}")
     List<${entity.nameCamelCase}Model> list${entity.nameCamelCase}(
@@ -24,6 +27,7 @@ public interface RestService{
         @Query("${param}")String ${param} <#if param_has_next>,</#if>
         </#list>
         );
+    </#if>
     </#if>
     </#list>
 }

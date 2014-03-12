@@ -10,9 +10,9 @@ import java.util.List;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
-
+<#if config.generateModels>
 import ${config.projectPackageId}.model.${entity.nameCamelCase}Model;
-
+</#if>
 import ${config.providerJavaPackage}.base.AbstractContentValues;
 
 /**
@@ -70,6 +70,7 @@ public class ${entity.nameCamelCase}ContentValues extends AbstractContentValues 
     </#switch>
     </#list>
 
+    <#if config.generateModels>
     public static ContentValues[] getContentValues(${entity.nameCamelCase}Model... items){
         List<ContentValues> values = new ArrayList<ContentValues>();
         for(${entity.nameCamelCase}Model item : items){
@@ -85,4 +86,5 @@ public class ${entity.nameCamelCase}ContentValues extends AbstractContentValues 
         </#list>
         return values.values();
     }
+    </#if>
 }
