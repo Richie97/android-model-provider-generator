@@ -3,6 +3,19 @@ ${header}
 </#if>
 package ${config.projectPackageId}.model;
 
+import ${config.providerJavaPackage}.${entity.nameLowerCase}.${entity.nameCamelCase}Cursor;
+import com.google.gson.annotations.SerializedName;
+<#list entity.fields as field>
+<#switch field.type.name()>
+<#case "DATE">
+import java.util.Date;
+<#break>
+<#case "ENUM">
+import ${config.providerJavaPackage}.${entity.nameLowerCase}.${field.nameCamelCase};
+<#break>
+</#switch>
+</#list>
+
 /**
  * Model object for the {@code ${entity.nameLowerCase}}.
  */
@@ -13,7 +26,7 @@ public class ${entity.nameCamelCase}Model{
     </#if>
     <#switch field.type.name()>
     <#case "DATE">
-    public <#if field.isNullable>Long<#else>long</#if> ${field.nameCamelCaseLowerCase};
+    public Date ${field.nameCamelCaseLowerCase};
     <#break>
     <#case "INTEGER">
     public <#if field.isNullable>Integer<#else>int</#if> ${field.nameCamelCaseLowerCase};
@@ -46,7 +59,7 @@ public class ${entity.nameCamelCase}Model{
 
     public ${entity.nameCamelCase}Model(${entity.nameCamelCase}Cursor cursor){
         <#list entity.fields as field>
-        this.${field.nameCamelCaseLowerCase} = cursor.get${field.nameCamelCase};
+        this.${field.nameCamelCaseLowerCase} = cursor.get${field.nameCamelCase}();
         </#list>
     }
 }

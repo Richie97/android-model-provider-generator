@@ -1,7 +1,9 @@
 package ${config.projectPackageId}.api;
 
 <#list model.entities as entity>
-import ${config.projectPackageId}.model.${entity.nameCamelCase};
+<#if entity.url?has_content>
+import ${config.projectPackageId}.model.${entity.nameCamelCase}Model;
+</#if>
 </#list>
 import java.util.List;
 import retrofit.http.GET;
@@ -12,7 +14,7 @@ public interface RestService{
     <#list model.entities as entity>
     <#if entity.url?has_content>
     @GET("${entity.url}")
-    List<${entity.nameCamelCase}> list${entity.nameCamelCase}(
+    List<${entity.nameCamelCase}Model> list${entity.nameCamelCase}(
         <#list entity.url?split("/") as x>
         <#if x?starts_with("{")>
         @Path("${x?replace("{", "")?replace("}", "")}")String ${x?replace("{", "")?replace("}", "")}<#if x_has_next>,<#elseif param_has_next>,</#if>

@@ -1,8 +1,8 @@
 {
 	"toolVersion": "1.5",
-	"projectPackageId": "com.example.app",
-	"authority": "com.example.app.provider",
-	"providerJavaPackage": "com.example.app.provider",
+	"projectPackageId": "com.test",
+	"authority": "com.test.provider",
+	"providerJavaPackage": "com.test.provider",
 	"providerClassName": "ExampleProvider",
 	"sqliteHelperClassName": "ExampleSQLiteOpenHelper",
 	"databaseFileName": "example.db",

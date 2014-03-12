@@ -3,10 +3,15 @@ ${header}
 </#if>
 package ${config.providerJavaPackage}.${entity.nameLowerCase};
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.net.Uri;
+
+import ${config.projectPackageId}.model.${entity.nameCamelCase}Model;
 
 import ${config.providerJavaPackage}.base.AbstractContentValues;
 
@@ -67,7 +72,7 @@ public class ${entity.nameCamelCase}ContentValues extends AbstractContentValues 
 
     public static ContentValues[] getContentValues(${entity.nameCamelCase}Model... items){
         List<ContentValues> values = new ArrayList<ContentValues>();
-        for(${entity.nameCamelCase} item : items){
+        for(${entity.nameCamelCase}Model item : items){
             values.add(getSingleContentValue(item));
         }
         return values.toArray(new ContentValues[values.size()]);
@@ -76,8 +81,8 @@ public class ${entity.nameCamelCase}ContentValues extends AbstractContentValues 
     public static ContentValues getSingleContentValue(${entity.nameCamelCase}Model item){
         ${entity.nameCamelCase}ContentValues values = new ${entity.nameCamelCase}ContentValues();
         <#list entity.fields as field>
-        values.put(${entity.nameCamelCase}Columns.${field.nameUpperCase}, item.${field.nameCamelCaseLowerCase});
+        values.put${field.nameCamelCase}(item.${field.nameCamelCaseLowerCase});
         </#list>
-        return values.getContentValues();
+        return values.values();
     }
 }

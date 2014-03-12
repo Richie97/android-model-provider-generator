@@ -395,6 +395,20 @@ public class Main {
         template.process(root, out);
     }
 
+    private void generateManifestItems(Arguments arguments) throws IOException, JSONException, TemplateException {
+        Template template = getFreeMarkerConfig().getTemplate("add_to_manifest.ftl");
+        JSONObject config = getConfig(arguments.inputDir);
+        File outputFile = new File(arguments.outputDir, "__add_to_manifest.txt");
+        Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", config);
+        root.put("model", Model.get());
+        root.put("header", Model.get().getHeader());
+
+        template.process(root, out);
+    }
+
     private void generateSqliteHelper(Arguments arguments) throws IOException, JSONException, TemplateException {
         Template template = getFreeMarkerConfig().getTemplate("sqlitehelper.ftl");
         JSONObject config = getConfig(arguments.inputDir);
@@ -431,6 +445,7 @@ public class Main {
         generateIntentService(arguments);
         generateRestService(arguments);
         generateSqliteHelper(arguments);
+        generateManifestItems(arguments);
     }
 
     public static void main(String[] args) throws Exception {

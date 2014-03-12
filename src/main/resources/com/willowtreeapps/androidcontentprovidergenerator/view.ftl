@@ -7,6 +7,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import ${config.providerJavaPackage}.${entity.nameLowerCase}.${entity.nameCamelCase}Cursor;
 
 import ${config.projectPackageId}.R;
 import oak.viewmodel.ViewModel;
@@ -14,7 +15,7 @@ import oak.viewmodel.ViewModel;
 /**
  * ViewModel object for the {@code ${entity.nameLowerCase}}.
  */
-public class ${entity.nameCamelCase}View extends RelativeLayout implements ViewModel<Cursor>{
+public class ${entity.nameCamelCase}View extends RelativeLayout implements ViewModel<${entity.nameCamelCase}Cursor>{
    TextView tv;
 
    public ${entity.nameCamelCase}View(Context context) {
@@ -36,7 +37,7 @@ public class ${entity.nameCamelCase}View extends RelativeLayout implements ViewM
     }
 
     @Override
-    public void populate(${entity.nameCamelCase} item) {
+    public void populate(${entity.nameCamelCase}Cursor item) {
         //Do stuff with Model class
     }
 }
