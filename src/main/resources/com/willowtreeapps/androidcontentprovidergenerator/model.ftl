@@ -57,9 +57,11 @@ public class ${entity.nameCamelCase}Model{
 
     public ${entity.nameCamelCase}Model(){}
 
+    <#if config.generateProvider>
     public ${entity.nameCamelCase}Model(${entity.nameCamelCase}Cursor cursor){
         <#list entity.fields as field>
         this.${field.nameCamelCaseLowerCase} = cursor.get${field.nameCamelCase}();
         </#list>
     }
+    </#if>
 }

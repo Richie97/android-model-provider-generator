@@ -6,8 +6,10 @@ import android.os.Bundle;
 import java.util.List;
 <#list model.entities as entity>
 import ${config.projectPackageId}.model.${entity.nameCamelCase}Model;
+<#if config.generateProvider>
 import ${config.providerJavaPackage}.${entity.nameLowerCase}.${entity.nameCamelCase}Columns;
 import ${config.providerJavaPackage}.${entity.nameLowerCase}.${entity.nameCamelCase}ContentValues;
+</#if>
 </#list>
 import retrofit.RestAdapter;
 
@@ -49,7 +51,9 @@ public class ApiService extends IntentService {
     <#if entity.url?has_content>
     private void get${entity.nameCamelCase}FromApi(Bundle intent){
         List<${entity.nameCamelCase}Model> items = service.list${entity.nameCamelCase}();
+        <#if config.generateProvider>
         getContentResolver().bulkInsert(${entity.nameCamelCase}Columns.CONTENT_URI, ${entity.nameCamelCase}ContentValues.getContentValues(items.toArray(new ${entity.nameCamelCase}Model[items.size()])));
+        </#if>
     }
     </#if>
     </#list>
