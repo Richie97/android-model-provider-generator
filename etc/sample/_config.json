@@ -8,8 +8,8 @@
 	"databaseFileName": "example.db",
 	"enableForeignKeys": true,
 	"projectBaseUrl": "http://api.example.com",
-	"generateProvider":false,
-	"generateModels":false,
+	"generateProvider":true,
+	"generateModels":true,
 	"generateViews":true,
 	"generateApi":true,
 }
