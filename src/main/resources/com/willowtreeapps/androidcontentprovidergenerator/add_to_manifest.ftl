@@ -1,7 +1,7 @@
 IMPORTANT: Copy the following into the application tag of your AndroidManifest.xml
 
 <service
-    android:name="${config.projectPackageId}.api.PlayerService"
+    android:name="${config.projectPackageId}.api.RestService"
     android:enabled="true" />
 <provider
     android:authorities="${config.providerJavaPackage}"
