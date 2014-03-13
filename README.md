@@ -25,22 +25,35 @@ This is where you declare a few parameters that will be used to generate the cod
 These are self-explanatory so here is an example:
 ```json
 {
-	"toolVersion": "1.5",                                 //Required
-	"projectPackageId": "com.test",                       //Required
-	"authority": "com.test.provider",                     //Required for ContentProvider generation
-	"providerJavaPackage": "com.test.provider",           //Required for ContentProvider generation
-	"providerClassName": "ExampleProvider",               //Required for ContentProvider generation
-	"sqliteHelperClassName": "ExampleSQLiteOpenHelper",   //Required for ContentProvider generation
-	"databaseFileName": "example.db",                     //Required for ContentProvider generation
-	"enableForeignKeys": true,                            //Required for ContentProvider generation
-	"projectBaseUrl": "http://api.example.com",           //Required for API generation
-	"generateProvider":true,                              //Optional: Defaults to True
-	"generateModels":true,                                //Optional: Defaults to True
-	"generateViews":true,                                 //Optional: Defaults to True
-	"generateApi":true,                                   //Optional: Defaults to True
+	"toolVersion": "1.5",
+	"projectPackageId": "com.test",
+	"authority": "com.test.provider",
+	"providerJavaPackage": "com.test.provider",
+	"providerClassName": "ExampleProvider",
+	"sqliteHelperClassName": "ExampleSQLiteOpenHelper",
+	"databaseFileName": "example.db",
+	"enableForeignKeys": true,
+	"projectBaseUrl": "http://api.example.com",
+	"generateProvider":true,
+	"generateModels":true,
+	"generateViews":true,
+	"generateApi":true,
 }
 ```
-
+Not all fields are required:
+- toolsVersion: Required for all generation types
+- projectPackageId: Required for all generation types
+- authority: Required for ContentProvider generation
+- providerJavaPackage: Required for ContentProvider generation
+- providerClassName: Required for ContentProvider generation
+- sqliteHelperClassName: Required for ContentProvider generation
+- databaseFileName: Required for ContentProvider generation
+- enableForeignKeys: Required for ContentProvider generation
+- projectBaseUrl: Required for API generation
+- generateProvider: Optional, defaults to true if not included
+- generateModels: Optional, defaults to true if not included
+- generateViews: Optional, defaults to true if not included
+- generateApi: Optional, defaults to true if not included
 
 ### Entity files
 
