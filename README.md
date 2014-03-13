@@ -7,13 +7,13 @@ A tool to generate a Content Provider and the associated ViewModels and Model cl
 It takes a set of entity (a.k.a "table") definitions as the input, and generates:
 - a `ContentProvider` class
 - a `SQLiteOpenHelper` class
-- one `BaseColumns` interface per entity 
+- one `BaseColumns` interface per entity
 - one `Cursor` class per entity
 - one `ContentValues` class per entity
 - one `Selection` class per entity
 - one `Model` class per entity
 - one `ViewModel` class per entity
-- one Layout xml file per ViewModel
+- one `Layout` xml file per `ViewModel`
 
 How to use
 ----------
@@ -25,21 +25,22 @@ This is where you declare a few parameters that will be used to generate the cod
 These are self-explanatory so here is an example:
 ```json
 {
-	"toolVersion": "1.5",
-	"projectPackageId": "com.test",
-	"authority": "com.test.provider",
-	"providerJavaPackage": "com.test.provider",
-	"providerClassName": "ExampleProvider",
-	"sqliteHelperClassName": "ExampleSQLiteOpenHelper",
-	"databaseFileName": "example.db",
-	"enableForeignKeys": true,
-	"projectBaseUrl": "http://api.example.com",
-	"generateProvider":true,
-	"generateModels":true,
-	"generateViews":true,
-	"generateApi":true,
+	"toolVersion": "1.5",                                 //Required
+	"projectPackageId": "com.test",                       //Required
+	"authority": "com.test.provider",                     //Required for ContentProvider generation
+	"providerJavaPackage": "com.test.provider",           //Required for ContentProvider generation
+	"providerClassName": "ExampleProvider",               //Required for ContentProvider generation
+	"sqliteHelperClassName": "ExampleSQLiteOpenHelper",   //Required for ContentProvider generation
+	"databaseFileName": "example.db",                     //Required for ContentProvider generation
+	"enableForeignKeys": true,                            //Required for ContentProvider generation
+	"projectBaseUrl": "http://api.example.com",           //Required for API generation
+	"generateProvider":true,                              //Optional: Defaults to True
+	"generateModels":true,                                //Optional: Defaults to True
+	"generateViews":true,                                 //Optional: Defaults to True
+	"generateApi":true,                                   //Optional: Defaults to True
 }
 ```
+
 
 ### Entity files
 
@@ -52,7 +53,7 @@ Currently the type can be:
 - `Integer` (`INTEGER`)
 - `Long` (`INTEGER`)
 - `Float` (`REAL`)
-- `Double` (`REAL`) 
+- `Double` (`REAL`)
 - `Boolean` (`INTEGER`)
 - `Date` (`INTEGER`)
 - `byte[]` (`BLOB`)

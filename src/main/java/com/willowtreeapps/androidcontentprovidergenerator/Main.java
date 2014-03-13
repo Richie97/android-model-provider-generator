@@ -190,14 +190,19 @@ public class Main {
         }
 
         // Ensure mandatory fields are present
+        if(mConfig.optBoolean(Json.GENERATE_PROVIDER)){
+            ensureString(Json.PROVIDER_JAVA_PACKAGE);
+            ensureString(Json.PROVIDER_CLASS_NAME);
+            ensureString(Json.SQLITE_HELPER_CLASS_NAME);
+            ensureString(Json.AUTHORITY);
+            ensureString(Json.DATABASE_FILE_NAME);
+            ensureBoolean(Json.ENABLE_FOREIGN_KEY);
+        }
+        if(mConfig.optBoolean(Json.GENERATE_API)){
+            ensureString(Json.PROJECT_BASE_URL);
+        }
         ensureString(Json.PROJECT_PACKAGE_ID);
-        ensureString(Json.PROVIDER_JAVA_PACKAGE);
-        ensureString(Json.PROVIDER_CLASS_NAME);
-        ensureString(Json.SQLITE_HELPER_CLASS_NAME);
-        ensureString(Json.AUTHORITY);
-        ensureString(Json.DATABASE_FILE_NAME);
-        ensureBoolean(Json.ENABLE_FOREIGN_KEY);
-        ensureString(Json.PROJECT_BASE_URL);
+
     }
 
     private void ensureString(String field) {
