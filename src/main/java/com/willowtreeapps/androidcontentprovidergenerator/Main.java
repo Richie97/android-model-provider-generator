@@ -190,7 +190,7 @@ public class Main {
         }
 
         // Ensure mandatory fields are present
-        if(mConfig.optBoolean(Json.GENERATE_PROVIDER)){
+        if(mConfig.optBoolean(Json.GENERATE_PROVIDER, true)){
             ensureString(Json.PROVIDER_JAVA_PACKAGE);
             ensureString(Json.PROVIDER_CLASS_NAME);
             ensureString(Json.SQLITE_HELPER_CLASS_NAME);
@@ -198,7 +198,7 @@ public class Main {
             ensureString(Json.DATABASE_FILE_NAME);
             ensureBoolean(Json.ENABLE_FOREIGN_KEY);
         }
-        if(mConfig.optBoolean(Json.GENERATE_API)){
+        if(mConfig.optBoolean(Json.GENERATE_API, true)){
             ensureString(Json.PROJECT_BASE_URL);
         }
         ensureString(Json.PROJECT_PACKAGE_ID);
