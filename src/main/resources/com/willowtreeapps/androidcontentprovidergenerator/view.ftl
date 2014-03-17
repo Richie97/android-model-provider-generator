@@ -21,7 +21,7 @@ import oak.viewmodel.ViewModel;
 /**
  * ViewModel object for the {@code ${entity.nameLowerCase}}.
  */
-public class ${entity.nameCamelCase}View extends RelativeLayout implements ViewModel<<#if config.generateProvider>${entity.nameCamelCase}Cursor<#elseif config.generateModels>${entity.nameCamelCase}Model<#else>Object</#if>>{
+public class ${entity.nameCamelCase}View extends RelativeLayout implements ViewModel<<#if config.generateProvider>Cursor<#elseif config.generateModels>${entity.nameCamelCase}Model<#else>Object</#if>>{
    TextView tv;
 
    public ${entity.nameCamelCase}View(Context context) {
@@ -43,7 +43,10 @@ public class ${entity.nameCamelCase}View extends RelativeLayout implements ViewM
     }
 
     @Override
-    public void populate(<#if config.generateProvider>${entity.nameCamelCase}Cursor<#elseif config.generateModels>${entity.nameCamelCase}Model<#else>Object</#if> item) {
+    public void populate(<#if config.generateProvider>Cursor<#elseif config.generateModels>${entity.nameCamelCase}Model<#else>Object</#if> item) {
         //Do stuff with Model class
+        <#if config.generateProvider>
+        ${entity.nameCamelCase}Cursor wrapper = new ${entity.nameCamelCase}Cursor(item);
+        </#if>
     }
 }

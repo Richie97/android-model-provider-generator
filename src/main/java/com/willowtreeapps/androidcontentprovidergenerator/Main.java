@@ -72,6 +72,7 @@ public class Main {
         public static final String GENERATE_MODELS = "generateModels";
         public static final String GENERATE_VIEWS = "generateViews";
         public static final String GENERATE_API = "generateApi";
+        public static final String GENERATE_FRAGMENT = "generateFragments";
     }
 
     private Configuration mFreemarkerConfig;
@@ -424,6 +425,24 @@ public class Main {
         }
     }
 
+    private void generateFragments(Arguments arguments) throws IOException, JSONException, TemplateException {
+        JSONObject config = getConfig(arguments.inputDir);
+        File baseDir = new File(arguments.outputDir, config.getString(Json.PROJECT_PACKAGE_ID).replace('.', '/'));
+        File fragmentClassDir = new File(baseDir, "fragment");
+        fragmentClassDir.mkdirs();
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", getConfig(arguments.inputDir));
+        root.put("header", Model.get().getHeader());
+        for (Entity entity : Model.get().getEntities()) {
+            File outputFile = new File(fragmentClassDir, entity.getNameCamelCase() + "ListFragment.java");
+            Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+            root.put("entity", entity);
+            Template template = getFreeMarkerConfig().getTemplate("fragment.ftl");
+            template.process(root, out);
+            IOUtils.closeQuietly(out);
+        }
+    }
+
     private void generateViews(Arguments arguments) throws IOException, JSONException, TemplateException {
         JSONObject config = getConfig(arguments.inputDir);
         File baseDir = new File(arguments.outputDir, config.getString(Json.PROJECT_PACKAGE_ID).replace('.', '/'));
@@ -477,12 +496,16 @@ public class Main {
         if(config.optBoolean(Json.GENERATE_API, true) || config.optBoolean(Json.GENERATE_PROVIDER, true)) {
             generateManifestItems(arguments);
         }
-        if(config.optBoolean(Json.GENERATE_VIEWS)){
+        if(config.optBoolean(Json.GENERATE_VIEWS, true)){
             generateViews(arguments);
         }
 
-        if(config.optBoolean(Json.GENERATE_MODELS)){
+        if(config.optBoolean(Json.GENERATE_MODELS, true)){
             generateModels(arguments);
+        }
+
+        if(config.optBoolean(Json.GENERATE_FRAGMENT)){
+            generateFragments(arguments);
         }
     }
 

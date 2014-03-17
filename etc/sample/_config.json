@@ -12,4 +12,5 @@
 	"generateModels":true,
 	"generateViews":true,
 	"generateApi":true,
+	"generateFragments":true,
 }

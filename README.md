@@ -38,6 +38,7 @@ These are self-explanatory so here is an example:
 	"generateModels":true,
 	"generateViews":true,
 	"generateApi":true,
+	"generateFragments":true,
 }
 ```
 Not all fields are required:
