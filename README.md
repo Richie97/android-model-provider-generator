@@ -72,7 +72,7 @@ Currently the type can be:
 - `byte[]` (`BLOB`)
 - `enum` (`INTEGER`).
 
-You can also optionally declare table contraints.
+You can also optionally declare table contraints, a URL path to append to the base url for api calls, and a set or query params as shown in the below JSON.
 
 Here is a `person.json` file as an example:
 

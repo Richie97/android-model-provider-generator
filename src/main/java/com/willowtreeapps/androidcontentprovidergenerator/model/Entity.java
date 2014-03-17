@@ -44,9 +44,6 @@ public class Entity {
         return this.url;
     }
 
-
-
-
     public Entity(String name) {
         mName = name.toLowerCase();
     }
