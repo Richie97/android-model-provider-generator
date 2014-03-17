@@ -3,7 +3,7 @@
 
     <groupId>com.willowtreeapps</groupId>
     <artifactId>wta_generator</artifactId>
-    <version>1.5</version> <!-- Do not forget to update Constants.VERSION, and the sample, and README.md when updating this value -->
+    <version>1.0</version> <!-- Do not forget to update Constants.VERSION, and the sample, and README.md when updating this value -->
     <packaging>jar</packaging>
 
     <name>WTA-Generator</name>

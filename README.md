@@ -25,7 +25,7 @@ This is where you declare a few parameters that will be used to generate the cod
 These are self-explanatory so here is an example:
 ```json
 {
-	"toolVersion": "1.5",
+	"toolVersion": "1.0",
 	"projectPackageId": "com.test",
 	"authority": "com.test.provider",
 	"providerJavaPackage": "com.test.provider",

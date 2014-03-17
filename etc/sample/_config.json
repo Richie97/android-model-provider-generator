@@ -1,5 +1,5 @@
 {
-	"toolVersion": "1.5",
+	"toolVersion": "1.0",
 	"projectPackageId": "com.test",
 	"authority": "com.test.provider",
 	"providerJavaPackage": "com.test.provider",
