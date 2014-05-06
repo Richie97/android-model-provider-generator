@@ -2,6 +2,7 @@
 	"fields": [
 		{
 			"name": "first_name",
+			"serializedName": "FirstName",
 			"type": "String"
 		},
 		{
@@ -31,7 +32,18 @@
 			"name": "company_id",
 			"type": "Long",
 			"nullable": false,
-		}
+		},
+        {
+         "name": "gender",
+         "type": "enum",
+         "enumName": "Gender",
+         "enumValues": [
+             "MALE",
+             "FEMALE",
+             "OTHER",
+         ],
+         "nullable": false,
+        }
 	],
 	
 	"constraints": [
@@ -43,5 +55,15 @@
 			"name": "fk_company",
 			"definition": "foreign key (company_id) references company (_id) on delete cascade",
 		},
+	],
+
+	"urlPath":"/person/{user}/info",
+	"queryParams":[
+	    {
+            "name": "userId",
+        },
+        {
+            "name": "stuff",
+        },
 	],
 }

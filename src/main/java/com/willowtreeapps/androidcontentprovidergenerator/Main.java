@@ -40,7 +40,6 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import com.beust.jcommander.JCommander;
 import com.willowtreeapps.androidcontentprovidergenerator.model.Constraint;
@@ -67,6 +66,13 @@ public class Main {
         public static final String AUTHORITY = "authority";
         public static final String DATABASE_FILE_NAME = "databaseFileName";
         public static final String ENABLE_FOREIGN_KEY = "enableForeignKeys";
+        public static final String PROJECT_BASE_URL = "projectBaseUrl";
+
+        public static final String GENERATE_PROVIDER = "generateProvider";
+        public static final String GENERATE_MODELS = "generateModels";
+        public static final String GENERATE_VIEWS = "generateViews";
+        public static final String GENERATE_API = "generateApi";
+        public static final String GENERATE_FRAGMENT = "generateFragments";
     }
 
     private Configuration mFreemarkerConfig;
@@ -95,7 +101,7 @@ public class Main {
             Entity entity = new Entity(entityName);
             String fileContents = FileUtils.readFileToString(entityFile);
             JSONObject entityJson = new JSONObject(fileContents);
-
+            entity.setUrl(entityJson.optString("urlPath"));
             // Fields
             JSONArray fieldsJson = entityJson.getJSONArray("fields");
             int len = fieldsJson.length();
@@ -103,6 +109,7 @@ public class Main {
                 JSONObject fieldJson = fieldsJson.getJSONObject(i);
                 if (Config.LOGD) Log.d(TAG, "fieldJson=" + fieldJson);
                 String name = fieldJson.getString(Field.Json.NAME);
+                String serializedName = fieldJson.optString(Field.Json.SERIALIZED_NAME);
                 String type = fieldJson.getString(Field.Json.TYPE);
                 boolean isIndex = fieldJson.optBoolean(Field.Json.INDEX, false);
                 boolean isNullable = fieldJson.optBoolean(Field.Json.NULLABLE, true);
@@ -117,7 +124,7 @@ public class Main {
                         enumValues.add(valueName);
                     }
                 }
-                Field field = new Field(name, type, isIndex, isNullable, defaultValue, enumName, enumValues);
+                Field field = new Field(name, serializedName, type, isIndex, isNullable, defaultValue, enumName, enumValues);
                 entity.addField(field);
             }
 
@@ -132,6 +139,17 @@ public class Main {
                     String definition = constraintJson.getString(Constraint.Json.DEFINITION);
                     Constraint constraint = new Constraint(name, definition);
                     entity.addConstraint(constraint);
+                }
+            }
+
+            // QueryParams (optional)
+            JSONArray paramsJson = entityJson.optJSONArray("queryParams");
+            if (paramsJson != null) {
+                len = paramsJson.length();
+                for (int i = 0; i < len; i++) {
+                    JSONObject constraintJson = paramsJson.getJSONObject(i);
+                    String name = constraintJson.getString(Constraint.Json.NAME);
+                    entity.addQueryParam(name);
                 }
             }
 
@@ -173,13 +191,19 @@ public class Main {
         }
 
         // Ensure mandatory fields are present
+        if(mConfig.optBoolean(Json.GENERATE_PROVIDER, true)){
+            ensureString(Json.PROVIDER_JAVA_PACKAGE);
+            ensureString(Json.PROVIDER_CLASS_NAME);
+            ensureString(Json.SQLITE_HELPER_CLASS_NAME);
+            ensureString(Json.AUTHORITY);
+            ensureString(Json.DATABASE_FILE_NAME);
+            ensureBoolean(Json.ENABLE_FOREIGN_KEY);
+        }
+        if(mConfig.optBoolean(Json.GENERATE_API, true)){
+            ensureString(Json.PROJECT_BASE_URL);
+        }
         ensureString(Json.PROJECT_PACKAGE_ID);
-        ensureString(Json.PROVIDER_JAVA_PACKAGE);
-        ensureString(Json.PROVIDER_CLASS_NAME);
-        ensureString(Json.SQLITE_HELPER_CLASS_NAME);
-        ensureString(Json.AUTHORITY);
-        ensureString(Json.DATABASE_FILE_NAME);
-        ensureBoolean(Json.ENABLE_FOREIGN_KEY);
+
     }
 
     private void ensureString(String field) {
@@ -225,16 +249,9 @@ public class Main {
     private void generateWrappers(Arguments arguments) throws IOException, JSONException, TemplateException {
         JSONObject config = getConfig(arguments.inputDir);
         String providerJavaPackage = config.getString(Json.PROVIDER_JAVA_PACKAGE);
-        File baseDir = new File(arguments.outputDir, config.getString(Json.PROJECT_PACKAGE_ID).replace('.', '/'));
         File providerDir = new File(arguments.outputDir, providerJavaPackage.replace('.', '/'));
         File baseClassesDir = new File(providerDir, "base");
-        File modelClassesDir = new File(baseDir, "model");
-        File viewClassesDir = new File(baseDir, "ui/viewmodel");
-        File resDir = new File(arguments.outputDir+"/res", "layout");
         baseClassesDir.mkdirs();
-        modelClassesDir.mkdirs();
-        viewClassesDir.mkdirs();
-        resDir.mkdirs();
 
         Map<String, Object> root = new HashMap<String, Object>();
         root.put("config", getConfig(arguments.inputDir));
@@ -292,29 +309,6 @@ public class Main {
             template.process(root, out);
             IOUtils.closeQuietly(out);
 
-            // Model builder
-            outputFile = new File(modelClassesDir, entity.getNameCamelCase() + "Model.java");
-            out = new OutputStreamWriter(new FileOutputStream(outputFile));
-            root.put("entity", entity);
-            template = getFreeMarkerConfig().getTemplate("model.ftl");
-            template.process(root, out);
-            IOUtils.closeQuietly(out);
-
-            // ViewModel builder
-            outputFile = new File(viewClassesDir, entity.getNameCamelCase() + "View.java");
-            out = new OutputStreamWriter(new FileOutputStream(outputFile));
-            root.put("entity", entity);
-            template = getFreeMarkerConfig().getTemplate("view.ftl");
-            template.process(root, out);
-            IOUtils.closeQuietly(out);
-
-            // Layout builder
-            outputFile = new File(resDir, "view_" + entity.getNameLowerCase() + ".xml");
-            out = new OutputStreamWriter(new FileOutputStream(outputFile));
-            root.put("entity", entity);
-            template = getFreeMarkerConfig().getTemplate("layout.ftl");
-            template.process(root, out);
-            IOUtils.closeQuietly(out);
 
             // Enums (if any)
             for (Field field : entity.getFields()) {
@@ -348,6 +342,54 @@ public class Main {
         template.process(root, out);
     }
 
+    private void generateIntentService(Arguments arguments) throws IOException, JSONException, TemplateException {
+        Template template = getFreeMarkerConfig().getTemplate("intentservice.ftl");
+        JSONObject config = getConfig(arguments.inputDir);
+        String apiJavaPackage = config.getString(Json.PROJECT_PACKAGE_ID) + ".api";
+        File apiDir = new File(arguments.outputDir, apiJavaPackage.replace('.', '/'));
+        apiDir.mkdirs();
+        File outputFile = new File(apiDir, "ApiService.java");
+        Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", config);
+        root.put("model", Model.get());
+        root.put("header", Model.get().getHeader());
+
+        template.process(root, out);
+    }
+
+    private void generateRestService(Arguments arguments) throws IOException, JSONException, TemplateException {
+        Template template = getFreeMarkerConfig().getTemplate("retroservice.ftl");
+        JSONObject config = getConfig(arguments.inputDir);
+        String apiJavaPackage = config.getString(Json.PROJECT_PACKAGE_ID) + ".api";
+        File apiDir = new File(arguments.outputDir, apiJavaPackage.replace('.', '/'));
+        apiDir.mkdirs();
+        File outputFile = new File(apiDir, "RestService.java");
+        Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", config);
+        root.put("model", Model.get());
+        root.put("header", Model.get().getHeader());
+
+        template.process(root, out);
+    }
+
+    private void generateManifestItems(Arguments arguments) throws IOException, JSONException, TemplateException {
+        Template template = getFreeMarkerConfig().getTemplate("add_to_manifest.ftl");
+        JSONObject config = getConfig(arguments.inputDir);
+        File outputFile = new File(arguments.outputDir, "__add_to_manifest.txt");
+        Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", config);
+        root.put("model", Model.get());
+        root.put("header", Model.get().getHeader());
+
+        template.process(root, out);
+    }
+
     private void generateSqliteHelper(Arguments arguments) throws IOException, JSONException, TemplateException {
         Template template = getFreeMarkerConfig().getTemplate("sqlitehelper.ftl");
         JSONObject config = getConfig(arguments.inputDir);
@@ -365,6 +407,69 @@ public class Main {
         template.process(root, out);
     }
 
+    private void generateModels(Arguments arguments) throws IOException, JSONException, TemplateException {
+        JSONObject config = getConfig(arguments.inputDir);
+        File baseDir = new File(arguments.outputDir, config.getString(Json.PROJECT_PACKAGE_ID).replace('.', '/'));
+        File modelClassesDir = new File(baseDir, "model");
+        modelClassesDir.mkdirs();
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", getConfig(arguments.inputDir));
+        root.put("header", Model.get().getHeader());
+        for (Entity entity : Model.get().getEntities()) {
+            File outputFile = new File(modelClassesDir, entity.getNameCamelCase() + "Model.java");
+            Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+            root.put("entity", entity);
+            Template template = getFreeMarkerConfig().getTemplate("model.ftl");
+            template.process(root, out);
+            IOUtils.closeQuietly(out);
+        }
+    }
+
+    private void generateFragments(Arguments arguments) throws IOException, JSONException, TemplateException {
+        JSONObject config = getConfig(arguments.inputDir);
+        File baseDir = new File(arguments.outputDir, config.getString(Json.PROJECT_PACKAGE_ID).replace('.', '/'));
+        File fragmentClassDir = new File(baseDir, "fragment");
+        fragmentClassDir.mkdirs();
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", getConfig(arguments.inputDir));
+        root.put("header", Model.get().getHeader());
+        for (Entity entity : Model.get().getEntities()) {
+            File outputFile = new File(fragmentClassDir, entity.getNameCamelCase() + "ListFragment.java");
+            Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+            root.put("entity", entity);
+            Template template = getFreeMarkerConfig().getTemplate("fragment.ftl");
+            template.process(root, out);
+            IOUtils.closeQuietly(out);
+        }
+    }
+
+    private void generateViews(Arguments arguments) throws IOException, JSONException, TemplateException {
+        JSONObject config = getConfig(arguments.inputDir);
+        File baseDir = new File(arguments.outputDir, config.getString(Json.PROJECT_PACKAGE_ID).replace('.', '/'));
+        File viewDir = new File(baseDir, "ui/viewmodel");
+        File resDir = new File(arguments.outputDir+"/res", "layout");
+        viewDir.mkdirs();
+        resDir.mkdirs();
+        Map<String, Object> root = new HashMap<String, Object>();
+        root.put("config", getConfig(arguments.inputDir));
+        root.put("header", Model.get().getHeader());
+        for (Entity entity : Model.get().getEntities()) {
+            File outputFile = new File(viewDir, entity.getNameCamelCase() + "View.java");
+            Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+            root.put("entity", entity);
+            Template template = getFreeMarkerConfig().getTemplate("view.ftl");
+            template.process(root, out);
+            IOUtils.closeQuietly(out);
+
+            outputFile = new File(resDir, "view_" + entity.getNameLowerCase() + ".xml");
+            out = new OutputStreamWriter(new FileOutputStream(outputFile));
+            root.put("entity", entity);
+            template = getFreeMarkerConfig().getTemplate("layout.ftl");
+            template.process(root, out);
+            IOUtils.closeQuietly(out);
+        }
+    }
+
     private void go(String[] args) throws IOException, JSONException, TemplateException {
         Arguments arguments = new Arguments();
         JCommander jCommander = new JCommander(arguments, args);
@@ -375,13 +480,33 @@ public class Main {
             return;
         }
 
-        getConfig(arguments.inputDir);
+        JSONObject config = getConfig(arguments.inputDir);
 
         loadModel(arguments.inputDir);
-        generateColumns(arguments);
-        generateWrappers(arguments);
-        generateContentProvider(arguments);
-        generateSqliteHelper(arguments);
+        if(config.optBoolean(Json.GENERATE_PROVIDER, true)) {
+            generateColumns(arguments);
+            generateWrappers(arguments);
+            generateContentProvider(arguments);
+            generateSqliteHelper(arguments);
+        }
+        if(config.optBoolean(Json.GENERATE_API, true)) {
+            generateIntentService(arguments);
+            generateRestService(arguments);
+        }
+        if(config.optBoolean(Json.GENERATE_API, true) || config.optBoolean(Json.GENERATE_PROVIDER, true)) {
+            generateManifestItems(arguments);
+        }
+        if(config.optBoolean(Json.GENERATE_VIEWS, true)){
+            generateViews(arguments);
+        }
+
+        if(config.optBoolean(Json.GENERATE_MODELS, true)){
+            generateModels(arguments);
+        }
+
+        if(config.optBoolean(Json.GENERATE_FRAGMENT)){
+            generateFragments(arguments);
+        }
     }
 
     public static void main(String[] args) throws Exception {

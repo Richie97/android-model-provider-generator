@@ -31,8 +31,18 @@ import org.apache.commons.lang.WordUtils;
 
 public class Entity {
     private final String mName;
+    private String url = "null";
     private final List<Field> mFields = new ArrayList<Field>();
     private final List<Constraint> mConstraints = new ArrayList<Constraint>();
+    private final List<String> mQueryParams = new ArrayList<String>();
+
+    public void setUrl(String url){
+        this.url = url;
+    }
+
+    public String getUrl(){
+        return this.url;
+    }
 
     public Entity(String name) {
         mName = name.toLowerCase();
@@ -45,6 +55,10 @@ public class Entity {
     public List<Field> getFields() {
         return Collections.unmodifiableList(mFields);
     }
+
+    public List<String> getQueryParams(){return Collections.unmodifiableList(mQueryParams);}
+
+    public void addQueryParam(String queryParam){mQueryParams.add(queryParam);}
 
     public void addConstraint(Constraint constraint) {
         mConstraints.add(constraint);

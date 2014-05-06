@@ -1,12 +1,27 @@
 <#if header??>
 ${header}
 </#if>
-package ${config.providerJavaPackage};
+package ${config.projectPackageId}.ui.viewmodel;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+<#if config.generateProvider>
+import ${config.providerJavaPackage}.${entity.nameLowerCase}.${entity.nameCamelCase}Cursor;
+<#elseif config.generateModels>
+import ${config.projectPackageId}.model.${entity.nameCamelCase}Model;
+<#else>
+import ${config.projectPackageId}.model.${entity.nameCamelCase}Model;
+</#if>
+
+import ${config.projectPackageId}.R;
+import oak.viewmodel.ViewModel;
 
 /**
  * ViewModel object for the {@code ${entity.nameLowerCase}}.
  */
-public class ${entity.nameCamelCase}View extends RelativeLayout implements ViewModel<Cursor>{
+public class ${entity.nameCamelCase}View extends RelativeLayout implements ViewModel<<#if config.generateProvider>Cursor<#elseif config.generateModels>${entity.nameCamelCase}Model<#else>Object</#if>>{
    TextView tv;
 
    public ${entity.nameCamelCase}View(Context context) {
@@ -28,7 +43,10 @@ public class ${entity.nameCamelCase}View extends RelativeLayout implements ViewM
     }
 
     @Override
-    public void populate(${entity.nameCamelCase} item) {
+    public void populate(<#if config.generateProvider>Cursor<#elseif config.generateModels>${entity.nameCamelCase}Model<#else>Object</#if> item) {
         //Do stuff with Model class
+        <#if config.generateProvider>
+        ${entity.nameCamelCase}Cursor wrapper = new ${entity.nameCamelCase}Cursor(item);
+        </#if>
     }
 }

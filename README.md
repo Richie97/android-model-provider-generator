@@ -1,14 +1,19 @@
-Android ContentProvider Generator
+WTA Generator
 =================================
+Forked from the awesome android-contentprovider-generator
 
-A tool to generate an Android ContentProvider.
+A tool to generate a Content Provider and the associated ViewModels and Model classes
+
 It takes a set of entity (a.k.a "table") definitions as the input, and generates:
 - a `ContentProvider` class
 - a `SQLiteOpenHelper` class
-- one `BaseColumns` interface per entity 
+- one `BaseColumns` interface per entity
 - one `Cursor` class per entity
 - one `ContentValues` class per entity
 - one `Selection` class per entity
+- one `Model` class per entity
+- one `ViewModel` class per entity
+- one `Layout` xml file per `ViewModel`
 
 How to use
 ----------
@@ -20,16 +25,36 @@ This is where you declare a few parameters that will be used to generate the cod
 These are self-explanatory so here is an example:
 ```json
 {
-	"toolVersion": "1.5",
-	"projectPackageId": "com.example.app",
-	"authority": "com.example.app.provider",
-	"providerJavaPackage": "com.example.app.provider",
+	"toolVersion": "1.0",
+	"projectPackageId": "com.test",
+	"authority": "com.test.provider",
+	"providerJavaPackage": "com.test.provider",
 	"providerClassName": "ExampleProvider",
 	"sqliteHelperClassName": "ExampleSQLiteOpenHelper",
 	"databaseFileName": "example.db",
 	"enableForeignKeys": true,
+	"projectBaseUrl": "http://api.example.com",
+	"generateProvider":true,
+	"generateModels":true,
+	"generateViews":true,
+	"generateApi":true,
+	"generateFragments":true,
 }
 ```
+Not all fields are required:
+- toolsVersion: Required for all generation types
+- projectPackageId: Required for all generation types
+- authority: Required for ContentProvider generation
+- providerJavaPackage: Required for ContentProvider generation
+- providerClassName: Required for ContentProvider generation
+- sqliteHelperClassName: Required for ContentProvider generation
+- databaseFileName: Required for ContentProvider generation
+- enableForeignKeys: Required for ContentProvider generation
+- projectBaseUrl: Required for API generation
+- generateProvider: Optional, defaults to true if not included
+- generateModels: Optional, defaults to true if not included
+- generateViews: Optional, defaults to true if not included
+- generateApi: Optional, defaults to true if not included
 
 ### Entity files
 
@@ -42,13 +67,13 @@ Currently the type can be:
 - `Integer` (`INTEGER`)
 - `Long` (`INTEGER`)
 - `Float` (`REAL`)
-- `Double` (`REAL`) 
+- `Double` (`REAL`)
 - `Boolean` (`INTEGER`)
 - `Date` (`INTEGER`)
 - `byte[]` (`BLOB`)
 - `enum` (`INTEGER`).
 
-You can also optionally declare table contraints.
+You can also optionally declare table contraints, a URL path to append to the base url for api calls, and a set or query params as shown in the below JSON.
 
 Here is a `person.json` file as an example:
 
@@ -57,39 +82,70 @@ Here is a `person.json` file as an example:
 	"fields": [
 		{
 			"name": "first_name",
-			"type": "String",
-			"default_value": "John"
+			"serializedName": "FirstName",
+			"type": "String"
 		},
 		{
 			"name": "last_name",
-			"type": "String",
-			"nullable": true,
-			"default_value": "Doe"
+			"type": "String"
 		},
 		{
 			"name": "age",
 			"type": "Integer",
+			"nullable": false
+		},
+		{
+			"name": "is_blue_eyes",
+			"type": "Boolean",
+			"default_value": "1"
+		},
+		{
+			"name": "date_of_birth",
+			"type": "Date",
 			"index": true
 		},
 		{
-			"name": "gender",
-			"type": "enum",
-			"enumName": "Gender",
-			"enumValues": [
-				"MALE",
-				"FEMALE",
-				"OTHER",
-			],
+			"name": "height",
+			"type": "Float"
+		},
+		{
+			"name": "company_id",
+			"type": "Long",
 			"nullable": false,
 		},
+        {
+         "name": "gender",
+         "type": "enum",
+         "enumName": "Gender",
+         "enumValues": [
+             "MALE",
+             "FEMALE",
+             "OTHER",
+         ],
+         "nullable": false,
+        }
 	],
-	
+
 	"constraints": [
 		{
 			"name": "unique_name",
 			"definition": "unique (first_name, last_name) on conflict replace"
-		}
-	]
+		},
+		{
+			"name": "fk_company",
+			"definition": "foreign key (company_id) references company (_id) on delete cascade",
+		},
+	],
+
+	"urlPath":"/person/{user}/info",
+	"queryParams":[
+	    {
+            "name": "userId",
+        },
+        {
+            "name": "stuff",
+        },
+	],
 }
 ```
 
@@ -102,11 +158,11 @@ If a `header.txt` file is present, its contents will be inserted at the top of e
 ### Get the app
 
 Download the jar from here:
-https://github.com/BoD/android-contentprovider-generator/releases/latest
+https://github.com/--insert jar here when it's done--
 
 ### Run the app
 
-`java -jar android-contentprovider-generator-1.5-bundle.jar -i <input folder> -o <output folder>`
+`java -jar wta-generator-1.5-bundle.jar -i <input folder> -o <output folder>`
 - Input folder: where to find _config.json and your entity json files
 - Output folder: where the resulting files will be generated
 
@@ -144,7 +200,15 @@ PersonContentValues values = new PersonContentValues();
 values.putFirstName("John").putAge(42);
 context.getContentResolver().update(personUri, values.values(), null, null);
 ```
+- When generating the Model Classes, if they are generated with a ContentProvider they come with a handy Constructor which takes a CursorWrapper of that objects type
 
+```java
+PersonCursor wrappedCursor = new PersonCursor(cursor);
+Person person = new Person(wrappedCursor);
+```
+
+- When generated, the API uses a stubbed out Retrofit interface and an IntentService for network calls
+- In addition, when generating the API, it also ties into the ContentProvider(if all components were generated)
 
 Building
 --------
@@ -153,7 +217,7 @@ You need maven to build this app.
 
 `mvn package`
 
-This will produce `android-contentprovider-generator-1.5-bundle.jar` in the `target` folder.
+This will produce `wta-generator-1.5-bundle.jar` in the `target` folder.
 
 
 Licence

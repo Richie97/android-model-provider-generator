@@ -36,6 +36,7 @@ public class Field {
         public static final String NAME = "name";
         public static final String TYPE = "type";
         public static final String INDEX = "index";
+        public static final String SERIALIZED_NAME = "serializedName";
         public static final String NULLABLE = "nullable";
         public static final String DEFAULT_VALUE = "default_value";
         public static final String ENUM_NAME = "enumName";
@@ -104,6 +105,7 @@ public class Field {
     private static HashMap<String, Type> sJsonNames = new HashMap<String, Type>();
 
     private final String mName;
+    private final String mSerializedName;
     private final Type mType;
     private final boolean mIsIndex;
     private final boolean mIsNullable;
@@ -111,14 +113,19 @@ public class Field {
     private final String mEnumName;
     private final List<String> mEnumValues = new ArrayList<String>();
 
-    public Field(String name, String type, boolean isIndex, boolean isNullable, String defaultValue, String enumName, List<String> enumValues) {
+    public Field(String name, String serializedName, String type, boolean isIndex, boolean isNullable, String defaultValue, String enumName, List<String> enumValues) {
         mName = name.toLowerCase();
+        mSerializedName = serializedName;
         mType = Type.fromJsonName(type);
         mIsIndex = isIndex;
         mIsNullable = isNullable;
         mDefaultValue = defaultValue;
         mEnumName = enumName;
         mEnumValues.addAll(enumValues);
+    }
+
+    public String getSerializedName(){
+        return this.mSerializedName;
     }
 
     public String getNameUpperCase() {

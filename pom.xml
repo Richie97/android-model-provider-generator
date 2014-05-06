@@ -2,12 +2,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.willowtreeapps</groupId>
-    <artifactId>android_contentprovider_generator</artifactId>
-    <version>1.5</version> <!-- Do not forget to update Constants.VERSION, and the sample, and README.md when updating this value -->
+    <artifactId>wta_generator</artifactId>
+    <version>1.0</version> <!-- Do not forget to update Constants.VERSION, and the sample, and README.md when updating this value -->
     <packaging>jar</packaging>
 
-    <name>GenerateAndroidProvider</name>
-    <url>http://JRAF.org/code</url>
+    <name>WTA-Generator</name>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -101,7 +101,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>android-contentprovider-generator-${project.version}-bundle</finalName>
+                    <finalName>wta-generator-${project.version}-bundle</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
